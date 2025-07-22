@@ -1,0 +1,45 @@
+{
+  "name": "quickstart-sdk",
+  "version": "0.1.0",
+  "description": "A quickstart SDK to setup an Polkadot Cloud project",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage"
+  },
+  "bin": {
+    "quickstart-sdk": "./index.js"
+  },
+  "keywords": [
+    "quickstart",
+    "sdk",
+    "scaffold",
+    "polkadot",
+    "cloud"
+  ],
+  "author": "@nomadbitcoin",
+  "license": "ISC",
+  "dependencies": {
+    "fs-extra": "^11.3.0",
+    "inquirer": "^12.8.2",
+    "figlet": "^1.8.0"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "setupFilesAfterEnv": [
+      "./jest.setup.js"
+    ],
+    "collectCoverageFrom": [
+      "index.js",
+      "!**/node_modules/**"
+    ],
+    "testMatch": [
+      "**/__tests__/**/*.test.js",
+      "**/?(*.)+(spec|test).js"
+    ]
+  }
+}

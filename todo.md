@@ -2,22 +2,24 @@
 
 ## v0.1.0 – Initial Setup
 
-- [ ] Scaffold CLI repo (TypeScript, Node 18)
-- [ ] Implement ASCII art with digits 3/6/9 (figlet)
-- [ ] Prompt project name, testing preference, author/social links
-- [ ] Create folder structure:
+- [x] Scaffold CLI repo (TypeScript, Node 18)
+- [x] Implement ASCII art with digits 3/6/9 (figlet)
+- [x] Prompt project name
+- [x] Create folder structure:
   - `contracts/develop`
   - `contracts/deploy`
   - `front`
   - `cloud-functions`
-- [ ] Create baseline files:
+- [x] Create baseline files:
   - `.cursorrules`
+  - `.github/workflows`
   - `README.md`
 
 ## v0.2.0 – Install Dependencies
 
-- [ ] Add runtime deps: `commander`, `inquirer`, `figlet`, `chalk`, `execa`
+- [x] Add runtime deps: `commander`, `inquirer`, `figlet`
 - [ ] Add dev deps: `typescript`, `ts-node`, `eslint`, `prettier`
+- [ ] Add other deps: `foundry`, `hardhat-polkadot`, `mdbook`, `create-polkadot-dapp`
 
 ## v0.3.0 – Foundry Template
 
@@ -35,7 +37,7 @@
 
 ## v0.6.0 – Documentation
 
-- [ ] Setup Docusaurus in `/docs`
+- [ ] Setup mdbook in `/docs`
 
 ## v0.7.0 – CI/CD
 

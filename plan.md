@@ -15,8 +15,8 @@ Create a CLI project starter (`npx quickstart init`) that scaffolds a Web3 monor
 | v0.5.0  | create-polkadot-dapp scaffold in `/front`      |
 | v0.6.0  | Docs skeleton in `/docs`                       |
 | v0.7.0  | GitHub Workflows CI/CD                         |
-| v0.8.0  | `.env`, `.gitignore`, secrets handling         |
-| v0.9.0  | Test suite integration                         |
+| v0.8.0  | Setup Cloud Services                           |
+| v0.9.0  | `.env`, `.gitignore`, secrets handling         |
 | v1.0.0  | Public release & contributing guides           |
 
 ## High-level Steps
