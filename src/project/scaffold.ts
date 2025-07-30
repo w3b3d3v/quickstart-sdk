@@ -1,13 +1,18 @@
-const path = require("path");
-const { ensureDirectories, writeFiles } = require("../utils/file-utils");
+import * as path from "path";
+import {
+  ensureDirectories,
+  writeFiles,
+  FileToWrite,
+} from "../utils/file-utils";
 
 /**
  * Create the base project structure
- * @param {string} projectDir - Project directory path
- * @returns {Promise<void>}
+ * @param projectDir - Project directory path
  */
-async function createProjectStructure(projectDir) {
-  const directories = [
+export async function createProjectStructure(
+  projectDir: string
+): Promise<void> {
+  const directories: string[] = [
     path.join(projectDir, "contracts/develop"),
     path.join(projectDir, "contracts/deploy"),
     path.join(projectDir, "front"),
@@ -21,12 +26,14 @@ async function createProjectStructure(projectDir) {
 
 /**
  * Generate project configuration files
- * @param {string} projectDir - Project directory path
- * @param {string} projectName - Project name
- * @returns {Promise<void>}
+ * @param projectDir - Project directory path
+ * @param projectName - Project name
  */
-async function createProjectFiles(projectDir, projectName) {
-  const files = [
+export async function createProjectFiles(
+  projectDir: string,
+  projectName: string
+): Promise<void> {
+  const files: FileToWrite[] = [
     {
       path: path.join(projectDir, ".cursor/rules/project-structure.mdc"),
       content: generateCursorRules(),
@@ -50,9 +57,8 @@ async function createProjectFiles(projectDir, projectName) {
 
 /**
  * Generate Cursor IDE rules content
- * @returns {string}
  */
-function generateCursorRules() {
+export function generateCursorRules(): string {
   return `# Project Structure Rules
 
 ## Directory Structure
@@ -70,9 +76,8 @@ function generateCursorRules() {
 
 /**
  * Generate frontend build workflow
- * @returns {string}
  */
-function generateFrontendWorkflow() {
+export function generateFrontendWorkflow(): string {
   return `name: Frontend Build
 
 on:
@@ -116,9 +121,8 @@ jobs:
 
 /**
  * Generate documentation build workflow
- * @returns {string}
  */
-function generateDocsWorkflow() {
+export function generateDocsWorkflow(): string {
   return `name: Documentation Build
 
 on:
@@ -165,10 +169,9 @@ jobs:
 
 /**
  * Generate README content
- * @param {string} projectName - Project name
- * @returns {string}
+ * @param projectName - Project name
  */
-function generateReadme(projectName) {
+export function generateReadme(projectName: string): string {
   return `# ${projectName}
 
 A quickstart Polkadot project created with quickstart-sdk.
@@ -222,12 +225,3 @@ This project includes GitHub Actions workflows for:
 - [React Documentation](https://reactjs.org/)
 `;
 }
-
-module.exports = {
-  createProjectStructure,
-  createProjectFiles,
-  generateCursorRules,
-  generateFrontendWorkflow,
-  generateDocsWorkflow,
-  generateReadme,
-};

@@ -1,10 +1,9 @@
-const figlet = require("figlet");
+import figlet from "figlet";
 
 /**
  * Display welcome ASCII art and logo
- * @returns {Promise<void>} Resolves when art is displayed successfully
  */
-function displayWelcomeArt() {
+export function displayWelcomeArt(): Promise<void> {
   return new Promise((resolve, reject) => {
     figlet(
       "POLKADOT CLOUD STARTER",
@@ -14,7 +13,7 @@ function displayWelcomeArt() {
         verticalLayout: "default",
         width: 120,
       },
-      (err, data) => {
+      (err: Error | null, data?: string) => {
         if (err) {
           console.log("Something went wrong with figlet...");
           console.dir(err);
@@ -22,7 +21,12 @@ function displayWelcomeArt() {
           return;
         }
 
-        const logo = [
+        if (!data) {
+          reject(new Error("No data returned from figlet"));
+          return;
+        }
+
+        const logo: string[] = [
           "             ..            ",
           "             ::::..        ",
           "          .:;;::::.        ",
@@ -48,7 +52,7 @@ function displayWelcomeArt() {
         const terminalWidth = process.stdout.columns || 120;
 
         // Center the logo
-        const centerLogo = (lines) => {
+        const centerLogo = (lines: string[]): string[] => {
           const maxLength = Math.max(...lines.map((line) => line.length));
           const padding = Math.max(
             0,
@@ -58,7 +62,7 @@ function displayWelcomeArt() {
         };
 
         // Center the text
-        const centerText = (lines) => {
+        const centerText = (lines: string[]): string[] => {
           const maxLength = Math.max(...lines.map((line) => line.length));
           const padding = Math.max(
             0,
@@ -87,7 +91,3 @@ function displayWelcomeArt() {
     );
   });
 }
-
-module.exports = {
-  displayWelcomeArt,
-};

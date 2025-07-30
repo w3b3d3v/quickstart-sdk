@@ -1,26 +1,29 @@
-const { input } = require("@inquirer/prompts");
-const path = require("path");
-const { displayWelcomeArt } = require("./utils/ascii-art");
-const {
-  createProjectStructure,
-  createProjectFiles,
-} = require("./project/scaffold");
-const { setupFrontendWithPolkadotDapp } = require("./frontend/setup");
+import { input } from "@inquirer/prompts";
+import * as path from "path";
+import { displayWelcomeArt } from "./utils/ascii-art";
+import { createProjectStructure, createProjectFiles } from "./project/scaffold";
+import { setupFrontendWithPolkadotDapp } from "./frontend/setup";
+
+/**
+ * Input validation function type
+ */
+type ValidationFunction = (input: string) => boolean | string;
 
 /**
  * Main CLI initialization function
- * @returns {Promise<void>}
  */
-async function init() {
+export async function init(): Promise<void> {
   try {
     // Display welcome ASCII art
     await displayWelcomeArt();
 
     // Prompt for project name using the new inquirer API
-    const projectName = await input({
+    const projectName: string = await input({
       message: "Enter your project name:",
-      validate: (input) =>
-        input.trim() ? true : "Project name cannot be empty.",
+      validate: ((input: string): boolean | string =>
+        input.trim()
+          ? true
+          : "Project name cannot be empty.") as ValidationFunction,
     });
 
     const trimmedProjectName = projectName.trim();
@@ -64,10 +67,12 @@ async function init() {
       console.log(`   2. npm run dev`);
       console.log(`\n📖 Check the README.md for more details!`);
     } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
       console.error(
         `\n⚠️  Project structure created successfully, but frontend setup encountered an issue:`
       );
-      console.error(`   ${error.message}`);
+      console.error(`   ${errorMessage}`);
       console.log(`\n✨ You can manually setup the frontend later by running:`);
       console.log(`   cd ${trimmedProjectName}/front`);
       console.log(
@@ -79,11 +84,8 @@ async function init() {
       console.log(`\n📁 Your project structure is ready at: ${projectDir}`);
     }
   } catch (error) {
-    console.error("Error creating project:", error.message);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error("Error creating project:", errorMessage);
     process.exit(1);
   }
 }
-
-module.exports = {
-  init,
-};

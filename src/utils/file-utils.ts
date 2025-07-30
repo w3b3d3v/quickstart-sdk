@@ -1,41 +1,42 @@
-const fs = require("fs-extra");
-const path = require("path");
+import * as fs from "fs-extra";
+import * as path from "path";
 
 /**
  * Ensure directory structure exists
- * @param {string[]} directories - Array of directory paths to create
- * @returns {Promise<void>}
+ * @param directories - Array of directory paths to create
  */
-async function ensureDirectories(directories) {
+export async function ensureDirectories(directories: string[]): Promise<void> {
   const promises = directories.map((dir) => fs.ensureDir(dir));
   await Promise.all(promises);
 }
 
 /**
  * Safely remove a directory or file
- * @param {string} targetPath - Path to remove
- * @returns {Promise<void>}
+ * @param targetPath - Path to remove
  */
-async function safeRemove(targetPath) {
+export async function safeRemove(targetPath: string): Promise<void> {
   try {
     if (await fs.pathExists(targetPath)) {
       await fs.remove(targetPath);
       console.log(`✅ Removed: ${targetPath}`);
     }
   } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
     console.warn(
-      `⚠️  Warning: Failed to remove ${targetPath}: ${error.message}`
+      `⚠️  Warning: Failed to remove ${targetPath}: ${errorMessage}`
     );
   }
 }
 
 /**
  * Move files from source to destination, handling overwrites
- * @param {string} sourcePath - Source directory
- * @param {string} destPath - Destination directory
- * @returns {Promise<void>}
+ * @param sourcePath - Source directory
+ * @param destPath - Destination directory
  */
-async function moveDirectoryContents(sourcePath, destPath) {
+export async function moveDirectoryContents(
+  sourcePath: string,
+  destPath: string
+): Promise<void> {
   if (!(await fs.pathExists(sourcePath))) {
     throw new Error(`Source path does not exist: ${sourcePath}`);
   }
@@ -53,11 +54,18 @@ async function moveDirectoryContents(sourcePath, destPath) {
 }
 
 /**
- * Write multiple files in parallel
- * @param {Array<{path: string, content: string}>} files - Array of file objects
- * @returns {Promise<void>}
+ * File object for writing multiple files
  */
-async function writeFiles(files) {
+export interface FileToWrite {
+  path: string;
+  content: string;
+}
+
+/**
+ * Write multiple files in parallel
+ * @param files - Array of file objects
+ */
+export async function writeFiles(files: FileToWrite[]): Promise<void> {
   const promises = files.map(({ path: filePath, content }) =>
     fs.writeFile(filePath, content)
   );
@@ -66,27 +74,27 @@ async function writeFiles(files) {
 
 /**
  * Check if a path exists
- * @param {string} targetPath - Path to check
- * @returns {Promise<boolean>}
+ * @param targetPath - Path to check
  */
-async function pathExists(targetPath) {
+export async function pathExists(targetPath: string): Promise<boolean> {
   return fs.pathExists(targetPath);
 }
 
 /**
  * Clean up temporary files and directories
- * @param {string[]} paths - Array of paths to clean up
- * @returns {Promise<void>}
+ * @param paths - Array of paths to clean up
  */
-async function cleanupTempFiles(paths) {
+export async function cleanupTempFiles(paths: string[]): Promise<void> {
   console.log("🧹 Cleaning up temporary files...");
 
   const cleanupPromises = paths.map(async (tempPath) => {
     try {
       await safeRemove(tempPath);
     } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
       console.warn(
-        `⚠️  Warning: Failed to clean up ${tempPath}: ${error.message}`
+        `⚠️  Warning: Failed to clean up ${tempPath}: ${errorMessage}`
       );
     }
   });
@@ -94,12 +102,3 @@ async function cleanupTempFiles(paths) {
   await Promise.all(cleanupPromises);
   console.log("✅ Temporary files cleaned up!");
 }
-
-module.exports = {
-  ensureDirectories,
-  safeRemove,
-  moveDirectoryContents,
-  writeFiles,
-  pathExists,
-  cleanupTempFiles,
-};

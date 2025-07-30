@@ -1,9 +1,11 @@
 #!/usr/bin/env node
 
-// Import from the new modular structure
-const { init } = require("./src/cli");
-const { displayWelcomeArt } = require("./src/utils/ascii-art");
-const { setupFrontendWithPolkadotDapp } = require("./src/frontend/setup");
+// Import from the compiled TypeScript modules
+const {
+  init,
+  displayWelcomeArt,
+  setupFrontendWithPolkadotDapp,
+} = require("./dist/index");
 
 // Export functions for testing and backward compatibility
 module.exports = {

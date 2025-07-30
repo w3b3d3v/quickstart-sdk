@@ -1,7 +1,17 @@
-const fs = require("fs-extra");
+const path = require("path");
+
+// Create a more comprehensive mock for fs-extra when used via TypeScript
+const mockFsExtra = {
+  ensureDir: jest.fn(),
+  pathExists: jest.fn(),
+  remove: jest.fn(),
+  readdir: jest.fn(),
+  move: jest.fn(),
+  writeFile: jest.fn(),
+};
 
 // Mock fs-extra
-jest.mock("fs-extra");
+jest.mock("fs-extra", () => mockFsExtra);
 
 const {
   ensureDirectories,
@@ -19,19 +29,21 @@ describe("File Utils", () => {
 
   describe("ensureDirectories", () => {
     test("should create all directories", async () => {
-      fs.ensureDir.mockResolvedValue();
+      mockFsExtra.ensureDir.mockResolvedValue();
 
       const directories = ["/test/dir1", "/test/dir2", "/test/dir3"];
       await ensureDirectories(directories);
 
-      expect(fs.ensureDir).toHaveBeenCalledTimes(3);
-      expect(fs.ensureDir).toHaveBeenCalledWith("/test/dir1");
-      expect(fs.ensureDir).toHaveBeenCalledWith("/test/dir2");
-      expect(fs.ensureDir).toHaveBeenCalledWith("/test/dir3");
+      expect(mockFsExtra.ensureDir).toHaveBeenCalledTimes(3);
+      expect(mockFsExtra.ensureDir).toHaveBeenCalledWith("/test/dir1");
+      expect(mockFsExtra.ensureDir).toHaveBeenCalledWith("/test/dir2");
+      expect(mockFsExtra.ensureDir).toHaveBeenCalledWith("/test/dir3");
     });
 
     test("should handle directory creation errors", async () => {
-      fs.ensureDir.mockRejectedValueOnce(new Error("Permission denied"));
+      mockFsExtra.ensureDir.mockRejectedValueOnce(
+        new Error("Permission denied")
+      );
 
       const directories = ["/test/dir1"];
 
@@ -43,27 +55,27 @@ describe("File Utils", () => {
 
   describe("safeRemove", () => {
     test("should remove existing path", async () => {
-      fs.pathExists.mockResolvedValue(true);
-      fs.remove.mockResolvedValue();
+      mockFsExtra.pathExists.mockResolvedValue(true);
+      mockFsExtra.remove.mockResolvedValue();
 
       await safeRemove("/test/path");
 
-      expect(fs.pathExists).toHaveBeenCalledWith("/test/path");
-      expect(fs.remove).toHaveBeenCalledWith("/test/path");
+      expect(mockFsExtra.pathExists).toHaveBeenCalledWith("/test/path");
+      expect(mockFsExtra.remove).toHaveBeenCalledWith("/test/path");
     });
 
     test("should skip non-existing path", async () => {
-      fs.pathExists.mockResolvedValue(false);
+      mockFsExtra.pathExists.mockResolvedValue(false);
 
       await safeRemove("/test/nonexistent");
 
-      expect(fs.pathExists).toHaveBeenCalledWith("/test/nonexistent");
-      expect(fs.remove).not.toHaveBeenCalled();
+      expect(mockFsExtra.pathExists).toHaveBeenCalledWith("/test/nonexistent");
+      expect(mockFsExtra.remove).not.toHaveBeenCalled();
     });
 
     test("should handle removal errors gracefully", async () => {
-      fs.pathExists.mockResolvedValue(true);
-      fs.remove.mockRejectedValue(new Error("Permission denied"));
+      mockFsExtra.pathExists.mockResolvedValue(true);
+      mockFsExtra.remove.mockRejectedValue(new Error("Permission denied"));
       const consoleSpy = jest.spyOn(console, "warn").mockImplementation();
 
       // Should not throw
@@ -78,26 +90,30 @@ describe("File Utils", () => {
 
   describe("moveDirectoryContents", () => {
     test("should move all items from source to destination", async () => {
-      fs.pathExists.mockResolvedValue(true);
-      fs.readdir.mockResolvedValue(["file1.txt", "file2.js", "subfolder"]);
-      fs.move.mockResolvedValue();
+      mockFsExtra.pathExists.mockResolvedValue(true);
+      mockFsExtra.readdir.mockResolvedValue([
+        "file1.txt",
+        "file2.js",
+        "subfolder",
+      ]);
+      mockFsExtra.move.mockResolvedValue();
 
       await moveDirectoryContents("/source", "/dest");
 
-      expect(fs.pathExists).toHaveBeenCalledWith("/source");
-      expect(fs.readdir).toHaveBeenCalledWith("/source");
-      expect(fs.move).toHaveBeenCalledTimes(3);
-      expect(fs.move).toHaveBeenCalledWith(
+      expect(mockFsExtra.pathExists).toHaveBeenCalledWith("/source");
+      expect(mockFsExtra.readdir).toHaveBeenCalledWith("/source");
+      expect(mockFsExtra.move).toHaveBeenCalledTimes(3);
+      expect(mockFsExtra.move).toHaveBeenCalledWith(
         "/source/file1.txt",
         "/dest/file1.txt",
         { overwrite: true }
       );
-      expect(fs.move).toHaveBeenCalledWith(
+      expect(mockFsExtra.move).toHaveBeenCalledWith(
         "/source/file2.js",
         "/dest/file2.js",
         { overwrite: true }
       );
-      expect(fs.move).toHaveBeenCalledWith(
+      expect(mockFsExtra.move).toHaveBeenCalledWith(
         "/source/subfolder",
         "/dest/subfolder",
         { overwrite: true }
@@ -105,20 +121,20 @@ describe("File Utils", () => {
     });
 
     test("should throw error if source does not exist", async () => {
-      fs.pathExists.mockResolvedValue(false);
+      mockFsExtra.pathExists.mockResolvedValue(false);
 
       await expect(
         moveDirectoryContents("/nonexistent", "/dest")
       ).rejects.toThrow("Source path does not exist: /nonexistent");
 
-      expect(fs.readdir).not.toHaveBeenCalled();
-      expect(fs.move).not.toHaveBeenCalled();
+      expect(mockFsExtra.readdir).not.toHaveBeenCalled();
+      expect(mockFsExtra.move).not.toHaveBeenCalled();
     });
 
     test("should handle move errors", async () => {
-      fs.pathExists.mockResolvedValue(true);
-      fs.readdir.mockResolvedValue(["file1.txt"]);
-      fs.move.mockRejectedValue(new Error("Destination occupied"));
+      mockFsExtra.pathExists.mockResolvedValue(true);
+      mockFsExtra.readdir.mockResolvedValue(["file1.txt"]);
+      mockFsExtra.move.mockRejectedValue(new Error("Destination occupied"));
 
       await expect(moveDirectoryContents("/source", "/dest")).rejects.toThrow(
         "Destination occupied"
@@ -128,7 +144,7 @@ describe("File Utils", () => {
 
   describe("writeFiles", () => {
     test("should write all files in parallel", async () => {
-      fs.writeFile.mockResolvedValue();
+      mockFsExtra.writeFile.mockResolvedValue();
 
       const files = [
         { path: "/test/file1.txt", content: "content1" },
@@ -138,14 +154,25 @@ describe("File Utils", () => {
 
       await writeFiles(files);
 
-      expect(fs.writeFile).toHaveBeenCalledTimes(3);
-      expect(fs.writeFile).toHaveBeenCalledWith("/test/file1.txt", "content1");
-      expect(fs.writeFile).toHaveBeenCalledWith("/test/file2.js", "content2");
-      expect(fs.writeFile).toHaveBeenCalledWith("/test/file3.md", "content3");
+      expect(mockFsExtra.writeFile).toHaveBeenCalledTimes(3);
+      expect(mockFsExtra.writeFile).toHaveBeenCalledWith(
+        "/test/file1.txt",
+        "content1"
+      );
+      expect(mockFsExtra.writeFile).toHaveBeenCalledWith(
+        "/test/file2.js",
+        "content2"
+      );
+      expect(mockFsExtra.writeFile).toHaveBeenCalledWith(
+        "/test/file3.md",
+        "content3"
+      );
     });
 
     test("should handle write errors", async () => {
-      fs.writeFile.mockRejectedValueOnce(new Error("Permission denied"));
+      mockFsExtra.writeFile.mockRejectedValueOnce(
+        new Error("Permission denied")
+      );
 
       const files = [{ path: "/test/file.txt", content: "content" }];
 
@@ -155,39 +182,39 @@ describe("File Utils", () => {
 
   describe("pathExists", () => {
     test("should return true for existing path", async () => {
-      fs.pathExists.mockResolvedValue(true);
+      mockFsExtra.pathExists.mockResolvedValue(true);
 
       const result = await pathExists("/test/existing");
 
       expect(result).toBe(true);
-      expect(fs.pathExists).toHaveBeenCalledWith("/test/existing");
+      expect(mockFsExtra.pathExists).toHaveBeenCalledWith("/test/existing");
     });
 
     test("should return false for non-existing path", async () => {
-      fs.pathExists.mockResolvedValue(false);
+      mockFsExtra.pathExists.mockResolvedValue(false);
 
       const result = await pathExists("/test/nonexistent");
 
       expect(result).toBe(false);
-      expect(fs.pathExists).toHaveBeenCalledWith("/test/nonexistent");
+      expect(mockFsExtra.pathExists).toHaveBeenCalledWith("/test/nonexistent");
     });
   });
 
   describe("cleanupTempFiles", () => {
     test("should clean up all temp files", async () => {
-      fs.pathExists.mockResolvedValue(true);
-      fs.remove.mockResolvedValue();
+      mockFsExtra.pathExists.mockResolvedValue(true);
+      mockFsExtra.remove.mockResolvedValue();
 
       const paths = ["/temp/dir1", "/temp/dir2", "/temp/file.txt"];
       await cleanupTempFiles(paths);
 
-      expect(fs.pathExists).toHaveBeenCalledTimes(3);
-      expect(fs.remove).toHaveBeenCalledTimes(3);
+      expect(mockFsExtra.pathExists).toHaveBeenCalledTimes(3);
+      expect(mockFsExtra.remove).toHaveBeenCalledTimes(3);
     });
 
     test("should handle cleanup errors gracefully", async () => {
-      fs.pathExists.mockResolvedValue(true);
-      fs.remove
+      mockFsExtra.pathExists.mockResolvedValue(true);
+      mockFsExtra.remove
         .mockResolvedValueOnce()
         .mockRejectedValueOnce(new Error("Permission denied"))
         .mockResolvedValueOnce();
@@ -206,8 +233,8 @@ describe("File Utils", () => {
     test("should handle empty paths array", async () => {
       await cleanupTempFiles([]);
 
-      expect(fs.pathExists).not.toHaveBeenCalled();
-      expect(fs.remove).not.toHaveBeenCalled();
+      expect(mockFsExtra.pathExists).not.toHaveBeenCalled();
+      expect(mockFsExtra.remove).not.toHaveBeenCalled();
     });
   });
 });

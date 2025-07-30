@@ -6,18 +6,42 @@ Create a CLI project starter (`npx quickstart init`) that scaffolds a Web3 monor
 
 ## Milestone Roadmap
 
-| Version | Scope                                          |
-| ------- | ---------------------------------------------- |
-| v0.1.0  | Initial folder & baseline files                |
-| v0.2.0  | Install base dependencies                      |
-| v0.3.0  | Foundry w/ UUPS pattern in `contracts/develop` |
-| v0.4.0  | Hardhat w/ Asset Hub in `contracts/deploy`     |
-| v0.5.0  | create-polkadot-dapp scaffold in `/front`      |
-| v0.6.0  | Docs skeleton in `/docs`                       |
-| v0.7.0  | GitHub Workflows CI/CD                         |
-| v0.8.0  | Setup Cloud Services                           |
-| v0.9.0  | `.env`, `.gitignore`, secrets handling         |
-| v1.0.0  | Public release & contributing guides           |
+| Version | Scope                                          | Status      |
+| ------- | ---------------------------------------------- | ----------- |
+| v0.1.0  | Initial folder & baseline files                | ✅ Complete |
+| v0.2.0  | Install base dependencies                      | Pending     |
+| v0.3.0  | Foundry w/ UUPS pattern in `contracts/develop` | Pending     |
+| v0.4.0  | Hardhat w/ Asset Hub in `contracts/deploy`     | Pending     |
+| v0.5.0  | create-polkadot-dapp scaffold in `/front`      | ✅ Complete |
+| v0.6.0  | Docs skeleton in `/docs`                       | Pending     |
+| v0.7.0  | GitHub Workflows CI/CD                         | Pending     |
+| v0.8.0  | Setup Cloud Services                           | Pending     |
+| v0.9.0  | `.env`, `.gitignore`, secrets handling         | Pending     |
+| v1.0.0  | Public release & contributing guides           | Pending     |
+
+## Recent Updates (v0.5.0)
+
+✅ **Frontend Integration Complete**
+
+- Integrated `create-polkadot-dapp` (w3b3d3v fork) with `react-solidity-hardhat` template
+- Automatic frontend scaffolding in `/front` directory using GitHub package source
+- Uses `--project-name` and `--template` CLI options
+- Comprehensive error handling and user feedback
+- Updated README with frontend development workflow
+
+### Frontend Features Added
+
+- React frontend with Polkadot API (PAPI) integration
+- Solidity smart contract support with Hardhat
+- Tailwind CSS for styling
+- Vite for fast development
+- ReactiveDOT + dotconnect for wallet interactions
+
+### Technical Implementation
+
+- Uses `npx --package=https://github.com/w3b3d3v/create-polkadot-dapp` to ensure w3b3d3v fork usage
+- Fallback instructions provide manual setup command if automated setup fails
+- Real-time output display during frontend scaffolding process
 
 ## High-level Steps
 

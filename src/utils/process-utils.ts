@@ -1,15 +1,34 @@
-const { spawn } = require("child_process");
+import { spawn, SpawnOptions } from "child_process";
+
+/**
+ * Result of command execution
+ */
+export interface CommandResult {
+  stdout: string;
+  stderr: string;
+  exitCode: number;
+}
+
+/**
+ * Options for command execution
+ */
+export interface ExecuteCommandOptions extends SpawnOptions {
+  showOutput?: boolean;
+}
 
 /**
  * Execute a command and return a promise with the result
- * @param {string} command - The command to execute
- * @param {string[]} args - Arguments for the command
- * @param {Object} options - Options for spawn
- * @returns {Promise<{stdout: string, stderr: string, exitCode: number}>}
+ * @param command - The command to execute
+ * @param args - Arguments for the command
+ * @param options - Options for spawn
  */
-function executeCommand(command, args, options = {}) {
+export function executeCommand(
+  command: string,
+  args: string[],
+  options: ExecuteCommandOptions = {}
+): Promise<CommandResult> {
   return new Promise((resolve, reject) => {
-    const defaultOptions = {
+    const defaultOptions: ExecuteCommandOptions = {
       stdio: ["pipe", "pipe", "pipe"],
       shell: true,
       ...options,
@@ -21,30 +40,30 @@ function executeCommand(command, args, options = {}) {
     let stderr = "";
 
     if (process.stdout) {
-      process.stdout.on("data", (data) => {
+      process.stdout.on("data", (data: Buffer) => {
         const message = data.toString();
         stdout += message;
         if (options.showOutput !== false) {
-          process.stdout.write(message);
+          (process.stdout as NodeJS.WriteStream).write(message);
         }
       });
     }
 
     if (process.stderr) {
-      process.stderr.on("data", (data) => {
+      process.stderr.on("data", (data: Buffer) => {
         const message = data.toString();
         stderr += message;
         if (options.showOutput !== false) {
-          process.stderr.write(message);
+          (process.stderr as NodeJS.WriteStream).write(message);
         }
       });
     }
 
-    process.on("close", (exitCode) => {
-      resolve({ stdout, stderr, exitCode });
+    process.on("close", (exitCode: number | null) => {
+      resolve({ stdout, stderr, exitCode: exitCode || 0 });
     });
 
-    process.on("error", (error) => {
+    process.on("error", (error: Error) => {
       reject(error);
     });
   });
@@ -52,12 +71,15 @@ function executeCommand(command, args, options = {}) {
 
 /**
  * Clone a git repository
- * @param {string} repoUrl - Repository URL to clone
- * @param {string} targetDir - Target directory for cloning
- * @param {string} cwd - Working directory
- * @returns {Promise<{stdout: string, stderr: string, exitCode: number}>}
+ * @param repoUrl - Repository URL to clone
+ * @param targetDir - Target directory for cloning
+ * @param cwd - Working directory
  */
-async function cloneRepository(repoUrl, targetDir, cwd) {
+export async function cloneRepository(
+  repoUrl: string,
+  targetDir: string,
+  cwd: string
+): Promise<CommandResult> {
   console.log(`📦 Cloning repository: ${repoUrl}`);
 
   const result = await executeCommand("git", ["clone", repoUrl, targetDir], {
@@ -74,10 +96,9 @@ async function cloneRepository(repoUrl, targetDir, cwd) {
 
 /**
  * Install dependencies using yarn
- * @param {string} cwd - Working directory
- * @returns {Promise<{stdout: string, stderr: string, exitCode: number}>}
+ * @param cwd - Working directory
  */
-async function installDependencies(cwd) {
+export async function installDependencies(cwd: string): Promise<CommandResult> {
   console.log("🔧 Installing dependencies...");
 
   const result = await executeCommand("yarn", ["install"], { cwd });
@@ -92,10 +113,9 @@ async function installDependencies(cwd) {
 
 /**
  * Build a project using yarn
- * @param {string} cwd - Working directory
- * @returns {Promise<{stdout: string, stderr: string, exitCode: number}>}
+ * @param cwd - Working directory
  */
-async function buildProject(cwd) {
+export async function buildProject(cwd: string): Promise<CommandResult> {
   console.log("🔨 Building the project...");
 
   const result = await executeCommand("yarn", ["build"], { cwd });
@@ -107,10 +127,3 @@ async function buildProject(cwd) {
   console.log("✅ Project built successfully!");
   return result;
 }
-
-module.exports = {
-  executeCommand,
-  cloneRepository,
-  installDependencies,
-  buildProject,
-};

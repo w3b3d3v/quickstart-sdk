@@ -1,24 +1,43 @@
-const path = require("path");
-const {
+import * as path from "path";
+import {
   executeCommand,
   cloneRepository,
   installDependencies,
   buildProject,
-} = require("../utils/process-utils");
-const {
+  CommandResult,
+} from "../utils/process-utils";
+import {
   pathExists,
   moveDirectoryContents,
   safeRemove,
   cleanupTempFiles,
-} = require("../utils/file-utils");
+} from "../utils/file-utils";
+
+/**
+ * Result of frontend setup operation
+ */
+export interface FrontendSetupResult {
+  success: boolean;
+  output: string;
+}
+
+/**
+ * Frontend validation result
+ */
+export interface ValidationResult {
+  valid: boolean;
+  errors: string[];
+}
 
 /**
  * Execute create-polkadot-dapp by cloning the w3b3d3v repository and using it locally
- * @param {string} projectDir - The main project directory
- * @param {string} projectName - The project name to use for the front app
- * @returns {Promise<{success: boolean, output: string}>}
+ * @param projectDir - The main project directory
+ * @param projectName - The project name to use for the front app
  */
-async function setupFrontendWithPolkadotDapp(projectDir, projectName) {
+export async function setupFrontendWithPolkadotDapp(
+  projectDir: string,
+  projectName: string
+): Promise<FrontendSetupResult> {
   console.log("\n🚀 Setting up frontend with create-polkadot-dapp...");
 
   const frontDir = path.join(projectDir, "front");
@@ -40,7 +59,7 @@ async function setupFrontendWithPolkadotDapp(projectDir, projectName) {
 
     // Step 4: Create the frontend project
     console.log("🎨 Creating frontend project...");
-    const createAppResult = await executeCommand(
+    const createAppResult: CommandResult = await executeCommand(
       "node",
       [
         path.join(tempRepoDir, "dist", "src", "bin", "main.js"),
@@ -75,11 +94,13 @@ async function setupFrontendWithPolkadotDapp(projectDir, projectName) {
 
 /**
  * Reorganize the frontend structure after creation
- * @param {string} frontDir - Frontend directory
- * @param {string} projectName - Project name
- * @returns {Promise<void>}
+ * @param frontDir - Frontend directory
+ * @param projectName - Project name
  */
-async function reorganizeFrontendStructure(frontDir, projectName) {
+export async function reorganizeFrontendStructure(
+  frontDir: string,
+  projectName: string
+): Promise<void> {
   console.log("🔧 Reorganizing frontend structure...");
 
   const createdProjectPath = path.join(frontDir, `${projectName}-frontend`);
@@ -112,9 +133,10 @@ async function reorganizeFrontendStructure(frontDir, projectName) {
       console.log("✅ Cleaned up nested directories!");
     }
   } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
     console.warn(
       "⚠️  Warning: Failed to reorganize frontend structure:",
-      error.message
+      errorMessage
     );
     throw error;
   }
@@ -122,11 +144,12 @@ async function reorganizeFrontendStructure(frontDir, projectName) {
 
 /**
  * Validate frontend setup requirements
- * @param {string} projectDir - Project directory
- * @returns {Promise<{valid: boolean, errors: string[]}>}
+ * @param projectDir - Project directory
  */
-async function validateFrontendSetup(projectDir) {
-  const errors = [];
+export async function validateFrontendSetup(
+  projectDir: string
+): Promise<ValidationResult> {
+  const errors: string[] = [];
 
   // Check if front directory exists
   const frontDir = path.join(projectDir, "front");
@@ -156,9 +179,3 @@ async function validateFrontendSetup(projectDir) {
     errors,
   };
 }
-
-module.exports = {
-  setupFrontendWithPolkadotDapp,
-  reorganizeFrontendStructure,
-  validateFrontendSetup,
-};
