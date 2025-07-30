@@ -35,6 +35,7 @@
     ],
     "collectCoverageFrom": [
       "index.js",
+      "src/**/*.js",
       "!**/node_modules/**"
     ],
     "testMatch": [
