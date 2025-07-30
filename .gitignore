@@ -141,3 +141,8 @@ docs/build/
 # Package files (keep source, exclude generated)
 *.tgz
 *.tar.gz
+
+
+plan.md
+todo.md
+package-lock.json
